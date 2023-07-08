@@ -2,12 +2,9 @@
   "manifest_version": 3,
   "name": "Qrcode For Me",
   "version": "0.1.0",
-  "description": "My Chrome Extension",
+  "description": "Generate QR code for any web page with ease using this Chrome extension.",
   "icons": {
     "128": "icons/icon_128.png"
-  },
-  "background": {
-    "service_worker": "background.js"
   },
   "action": {
     "default_title": "Qrcode For Me",
