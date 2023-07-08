@@ -1,7 +1,8 @@
-# <img src="public/icons/icon_128.png" width="45" align="left">
-# QR Code for Me Chrome Extension
+# <img src="public/icons/icon_128.png" width="45" align="left"> QR Code for Me Chrome Extension
 
 The QR Code for Me Chrome Extension allows you to quickly generate QR codes for any web page and conveniently copy or download the resulting QR code image.
+
+<img width="299" alt="截圖 2023-07-08 下午1 36 30" src="https://github.com/jchang6513/qrcode-for-me-extension/assets/31400914/9e87f47b-4627-4341-bba0-4c1d80c94f30">
 
 ## Features
 
