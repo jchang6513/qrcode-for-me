@@ -17,5 +17,8 @@
     "webpack": "^5.88.1",
     "webpack-cli": "^4.10.0",
     "webpack-merge": "^5.9.0"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.3"
   }
 }

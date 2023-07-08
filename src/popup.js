@@ -1,112 +1,48 @@
 'use strict';
-
+const QRCode = require('qrcode')
 import './popup.css';
 
-(function () {
-  // We will make use of Storage API to get and store `count` value
-  // More information on Storage API can we found at
-  // https://developer.chrome.com/extensions/storage
-
-  // To get storage access, we have to mention it in `permissions` property of manifest.json file
-  // More information on Permissions can we found at
-  // https://developer.chrome.com/extensions/declare_permissions
-  const counterStorage = {
-    get: (cb) => {
-      chrome.storage.sync.get(['count'], (result) => {
-        cb(result.count);
-      });
-    },
-    set: (value, cb) => {
-      chrome.storage.sync.set(
-        {
-          count: value,
-        },
-        () => {
-          cb();
-        }
-      );
-    },
-  };
-
-  function setupCounter(initialValue = 0) {
-    document.getElementById('counter').innerHTML = initialValue;
-
-    document.getElementById('incrementBtn').addEventListener('click', () => {
-      updateCounter({
-        type: 'INCREMENT',
-      });
-    });
-
-    document.getElementById('decrementBtn').addEventListener('click', () => {
-      updateCounter({
-        type: 'DECREMENT',
-      });
-    });
-  }
-
-  function updateCounter({ type }) {
-    counterStorage.get((count) => {
-      let newCount;
-
-      if (type === 'INCREMENT') {
-        newCount = count + 1;
-      } else if (type === 'DECREMENT') {
-        newCount = count - 1;
-      } else {
-        newCount = count;
-      }
-
-      counterStorage.set(newCount, () => {
-        document.getElementById('counter').innerHTML = newCount;
-
-        // Communicate with content script of
-        // active tab by sending a message
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const tab = tabs[0];
-
-          chrome.tabs.sendMessage(
-            tab.id,
-            {
-              type: 'COUNT',
-              payload: {
-                count: newCount,
-              },
-            },
-            (response) => {
-              console.log('Current count value passed to contentScript file');
-            }
-          );
-        });
-      });
-    });
-  }
-
-  function restoreCounter() {
-    // Restore count value
-    counterStorage.get((count) => {
-      if (typeof count === 'undefined') {
-        // Set counter value as 0
-        counterStorage.set(0, () => {
-          setupCounter(0);
-        });
-      } else {
-        setupCounter(count);
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', restoreCounter);
-
-  // Communicate with background file by sending a message
-  chrome.runtime.sendMessage(
+const generateQRCode = (message) => {
+  QRCode.toCanvas(
+    canvas,
+    message,
     {
-      type: 'GREETINGS',
-      payload: {
-        message: 'Hello, my name is Pop. I am from Popup.',
-      },
+      margin: 1,
+      width: 220,
     },
-    (response) => {
-      console.log(response.message);
+    (error) => {
+      if (error) console.error(error)
+      console.log('success!');
     }
   );
+}
+
+(function () {
+  const canvas = document.getElementById('canvas')
+  const messageText = document.getElementById('message')
+
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    const currentTab = tabs[0];
+    const currentUrl = currentTab.url;
+    messageText.value = currentUrl;
+    generateQRCode(currentUrl);
+  });
+
+  messageText.addEventListener('keyup', (event) => {
+    generateQRCode(event.currentTarget.value);
+  });
+
+  canvas.addEventListener("dblclick", function() {
+    canvas.toBlob(function(blob) {
+      const item = new ClipboardItem({ "image/png": blob });
+
+      navigator.clipboard.write([item])
+        .then(function() {
+          console.log("Image copied to clipboard successfully.");
+        })
+        .catch(function(error) {
+          console.error("Unable to copy image to clipboard:", error);
+        });
+    });
+  });
 })();
